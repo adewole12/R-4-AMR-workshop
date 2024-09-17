@@ -94,14 +94,51 @@ gdp_by_continents_by_year <- gapminder %>%
   group_by(continent, year) %>% 
   summarise(mean_GdpPerCap = mean(gdpPercap),
             std_GdpPerCap = sd(gdpPercap),
+            se_GdpPerCap = sd(gdpPercap)/sqrt(n()),
             minGdpPerCap = min(gdpPercap),
-            maxGdpPerCap = max(gdpPercap))
+            maxGdpPerCap = max(gdpPercap),
+            Gdp_range = (maxGdpPerCap - minGdpPerCap))
 
 gdp_by_continents_by_year
 
+###########################################
+gapminder %>% 
+  filter(year == 2002) %>% 
+  count(continent, sort = TRUE)
+
+gapminder %>% 
+  group_by(continent) %>% 
+  summarise(se_le = sd(lifeExp)/sqrt(n()))
 
 
 
+###Mutate function
+
+gdp_by_pop_continents_by_year <- gapminder %>% 
+  mutate(gdp_billion = gdpPercap*pop/10^9) %>% 
+  group_by(continent, year) %>% 
+  summarise(mean_GdpPerCap = mean(gdpPercap),
+            std_GdpPerCap = sd(gdpPercap),
+            se_GdpPerCap = sd(gdpPercap)/sqrt(n()),
+            mean_gdp_billion = mean(gdp_billion),
+            sd_gdp_billion = sd(gdp_billion),
+            minGdpPerCap = min(gdpPercap),
+            maxGdpPerCap = max(gdpPercap),
+            Gdp_range = (maxGdpPerCap - minGdpPerCap))
+
+gdp_by_pop_continents_by_year
+
+
+####Using ifelse to add additional conditions
+
+gapminder %>% 
+  mutate(gdp_billion = ifelse(lifeExp > 55, gdpPercap*pop/10^9, NA)) %>% 
+  group_by(continent, year) %>% 
+  summarise(mean_GdpPerCap = mean(gdpPercap),
+            std_GdpPerCap = sd(gdpPercap),
+            se_GdpPerCap = sd(gdpPercap)/sqrt(n()),
+            mean_gdp_billion = mean(gdp_billion),
+            sd_gdp_billion = sd(gdp_billion))
 
 
 
