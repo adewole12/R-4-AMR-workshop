@@ -73,12 +73,35 @@ gapminder %>%
 lifeExpCountry <- gapminder %>%
   group_by(country) %>% 
   summarise(mean_life_exp = mean(lifeExp))%>% 
-  arrange(mean_life_exp)
+  arrange(desc(mean_life_exp))
+
+?arrange
 
 ## Filter by country with the maximum and minimum life expectancy
 
 lifeExpCountry %>% 
   filter(mean_life_exp == min(mean_life_exp) | mean_life_exp == max(mean_life_exp))
+
+
+gapminder %>%
+  group_by(country) %>% 
+  summarise(mean_life_exp = mean(lifeExp))%>% 
+  filter(mean_life_exp == min(mean_life_exp)| mean_life_exp == max(mean_life_exp))
+
+
+## Gdp by year and country 
+gdp_by_continents_by_year <- gapminder %>% 
+  group_by(continent, year) %>% 
+  summarise(mean_GdpPerCap = mean(gdpPercap),
+            std_GdpPerCap = sd(gdpPercap),
+            minGdpPerCap = min(gdpPercap),
+            maxGdpPerCap = max(gdpPercap))
+
+gdp_by_continents_by_year
+
+
+
+
 
 
 
