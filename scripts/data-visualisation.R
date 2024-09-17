@@ -7,3 +7,4 @@ library(readr)
 #####Load in the data###############################
 gapminder <- read_csv("data/gapminder_data.csv")
 View(gapminder)
+head(gapminder, 5)
