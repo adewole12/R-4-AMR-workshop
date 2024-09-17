@@ -18,3 +18,16 @@ ggplot(
                 x = gdpPercap)
   ) +
   geom_point()
+
+
+
+############trend of life expectancy over time########################
+ggplot(
+  data = gapminder,
+  mapping = aes(y = lifeExp,
+                x = year                )
+  ) +
+  geom_line(mapping = aes(colour = continent, group = country))
+
+
+
