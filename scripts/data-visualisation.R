@@ -8,3 +8,13 @@ library(readr)
 gapminder <- read_csv("data/gapminder_data.csv")
 View(gapminder)
 head(gapminder, 5)
+
+#########exploratory visualisation ##############
+
+## Relationship between GDP per capital and life expectancy
+ggplot(
+  data = gapminder,
+  mapping = aes(y = lifeExp,
+                x = gdpPercap)
+  ) +
+  geom_point()
