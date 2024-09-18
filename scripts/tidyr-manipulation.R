@@ -76,7 +76,6 @@ a <- gap_long2 %>%
 waldo::compare(a,b)
 all.equal(gap_long, gap_long2)
 
-
 ##### Convert long to wider format
 gap_normal <- gap_long %>% 
   pivot_wider(names_from = obstype, values_from = obs_values) 
@@ -84,10 +83,9 @@ gap_normal <- gap_long %>%
 dim(gap_normal)
 gap_normal <- gap_normal[,names(gapminder)]
 
-
+# compare the two formats
 waldo::compare(gap_normal, gap_wide)
-all.equal(gap_normal, gap_wide)
-
+all.equal(gap_normal, gap_wide) #you can also use this to compare different items
 
 ?all.equal
 
