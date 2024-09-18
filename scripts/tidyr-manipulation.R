@@ -89,5 +89,5 @@ waldo::compare(gap_normal, gap_wide)
 all.equal(gap_normal, gap_wide)
 
 
-
+?all.equal
 
