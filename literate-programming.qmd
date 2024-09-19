@@ -1,0 +1,92 @@
+---
+title: "Literate programming"
+author: "Adewole Adekola"
+format: html
+---
+
+## Quarto
+
+Quarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see <https://quarto.org>.
+
+## Running Code
+
+When you click the **Render** button a document will be generated that includes both content and the output of embedded code. You can embed code like this:
+
+```{r, include = FALSE}
+#| echo: false
+# Load pacman and install the required packages
+library(ggplot2)
+library(readr)
+library(tidyverse)
+
+#####Load in the data###############################
+gapminder <- read_csv("data/gapminder_data.csv")
+View(gapminder)
+head(gapminder, 5)
+```
+
+You can add options to executable code like this
+
+```{r}
+#| echo: false
+#| message: false
+
+ggplot(
+  data = gapminder,
+  mapping = aes(y = lifeExp,
+                x = gdpPercap)) +
+  geom_point(alpha = 0.3, mapping = aes(colour = continent)) +
+  scale_x_log10() +
+  geom_smooth(method = "lm", colour = "red", linewidth = 0.4) 
+```
+
+The `echo: false` option disables the printing of code (only output is displayed).
+
+```{r, echo = FALSE}
+gapminder %>% 
+  filter(continent == "Americas") %>% 
+  ggplot(mapping = aes(x = year, y = lifeExp)) +
+  geom_line(aes(colour = country)) +
+  facet_wrap(~country) +
+  theme(axis.text.x = element_text(angle = 45)) +
+  theme(legend.position="none")
+```
+## Running error to show as part of output
+This can be achieved with silencing the error to prevent it from halting the rendering and to generate it as part of the output
+
+```{r}
+#| error: true
+x + y 
+```
+
+
+
+
+
+## Writing in Markdowwn
+
+**Bold text**
+
+*italics* or use *underscore for italics*
+
+***bold and italics***
+
+A list can be generated also
+
+List \* Item 1 \* Another one \* And another one \* Nested element here \* Like this
+
+For numbred list, you can use this
+
+1.  Number one
+2.  Number two
+3.  Number three
+
+<!-- To add comments, write the comment first, highlight it and press Shift Ctrl C, it will automatically generate the wrapping -->
+
+## LaTeX equations can also be written in Quatro
+
+It is done by wrapping in
+
+$$
+y = \mu + \sum_{i=1}^p \beta_i x_i + \epsilon
+$$ Einstein's famous formula is $e = mc^2$
