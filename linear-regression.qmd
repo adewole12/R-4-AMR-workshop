@@ -1,0 +1,208 @@
+---
+title: "Linear regression"
+author: "Adewole Adekola"
+format: html
+---
+
+```{r libraries}
+#| include: false
+#| message: false
+#| warning: false
+
+library(tidyverse)
+library(broom)
+library(gt)
+
+```
+
+
+```{r load-data}
+#| echo: false
+#| message: false
+#| include: false
+london_data <-  read_csv("data/English_IMD_2019_Domains_rebased_London_by_CDRC.csv")
+
+head(london_data)
+glimpse(london_data)
+skimr::skim(london_data)
+```
+
+## Simple Linear Regression
+It is always a good practice to do some data exploration before starting to do any major work on the data when carrying out regression. Always good to explore the relationship between the data such as `health_london_rank` and living environment (`livingEnv_london_rank`). 
+
+A good approach is by carrying out data visualisation to explore this 
+
+```{r}
+ggplot(london_data, aes(livingEnv_london_rank, health_london_rank)) +
+  geom_point()
+```
+
+```{r}
+livingEnv_health_model <- lm(health_london_rank ~ livingEnv_london_rank,
+                             data = london_data)
+livingEnv_health_model 
+
+summary(livingEnv_health_model)
+
+tidy(livingEnv_health_model)
+
+augment(livingEnv_health_model)
+```
+
+```{r}
+#| include: false
+#| echo: false
+livingEnv_health_model$coefficients
+
+livingEnv_health_model$coefficients["livingEnv_london_rank"]
+
+summary(livingEnv_health_model)$coefficients
+
+p_value <- summary(livingEnv_health_model)$coefficients["livingEnv_london_rank", "Pr(>|t|)"]
+
+
+```
+One unit increase in living environment rank is related to a `r livingEnv_health_model$coefficients["livingEnv_london_rank"]` pints increase in theIMD rank . This increase is significant with a $p$-value of `r summary(livingEnv_health_model)$coefficients["livingEnv_london_rank", "Pr(>|t|)"]`.
+
+## Log transformation
+
+```{r}
+livingEnv_health_logmodel <- lm(health_london_rank ~ log(livingEnv_london_rank),
+                             data = london_data)
+
+summary(livingEnv_health_model)
+
+tidy(livingEnv_health_model)
+```
+
+
+```{r}
+# health_rank_pred <- fitted(livingEnv_health_logmodel)
+# health_rank_pred <- as.data.frame(health_rank_pred)
+# 
+# health_rank_pred$residuals <- residuals(livingEnv_health_logmodel)
+# health_rank_pred$livingEnv_rank <- london_data$livingEnv_rank_london_rank
+# health_rank_pred$health_rank_raw <- london_data$health_london_rank
+# 
+# head(health_rank_pred)
+# 
+# ggplot(health_rank_pred, aes(log(livingEnv_rank), health_rank_raw))+
+#   geom_point(alpha = 0.3) +
+#   geom_smooth(method = "lm")
+#   #geom_line((aes(log(livingEnv_rank), health_rank_pred), colour = "blue"))
+```
+
+
+## Challenge 1
+Use the `gapminder` data to create a linear model between two continuous variables
+
+
+```{r}
+gapminder <- read_csv("data/gapminder_data.csv")
+
+asia_1952 <- gapminder %>% 
+  filter(continent == 'Asia' & year == 1952)
+
+asia_1952 %>% 
+  ggplot(aes(pop, gdpPercap)) +
+  geom_point() +
+  geom_smooth(method = "lm")
+
+gdp_pop_asia_1952_model <- lm(gdpPercap ~ pop,
+                    data = asia_1952)
+
+summary(gdp_pop_asia_1952_model)
+
+augment(gdp_pop_asia_1952_model)
+
+tidy(gdp_pop_asia_1952_model)
+
+
+```
+
+Load additional packages for testing the necessary assumptions for the linear regression
+
+```{r}
+library(sandwich)
+library(olsrr)
+library(lmtest)
+```
+
+We need to test for heteroscedasticity using the robust regression using the 
+
+```{r}
+livingEnv_health_logmodel$robse <- vcov(livingEnv_health_logmodel, type = 'HCI')
+
+coeftest(livingEnv_health_logmodel, livingEnv_health_logmodel$robse)
+
+tidy(livingEnv_health_logmodel)
+
+summary(livingEnv_health_logmodel)
+
+```
+
+### Testing for normality
+
+```{r}
+ols_test_normality(livingEnv_health_logmodel)
+```
+
+## Residual vs fitted values plot
+```{r}
+ols_plot_resid_fit(livingEnv_health_logmodel)
+
+ols_plot_resid_hist(livingEnv_health_logmodel)
+
+```
+
+
+## Using Broom packages
+
+```{r}
+tidy_model <- tidy(livingEnv_health_logmodel)
+
+augment(livingEnv_health_logmodel)
+
+glance(livingEnv_health_logmodel)
+```
+
+
+
+
+```{r}
+
+tidy_model %>%
+  gt() %>%
+  tab_header(
+    title = "Linear Regression Results",
+  )
+```
+
+
+## Generalised linear model
+
+```{r}
+london_data <- london_data %>% 
+  mutate(city = la19nm == "City of London")
+
+glm_city_incomerank_model <- glm(city ~ Income_london_rank, london_data,
+                                family = "binomial")
+```
+
+
+
+
+
+
+```{r}
+glm_city_incomerank_model
+
+summary(glm_city_incomerank_model)
+
+tidy(glm_city_incomerank_model)
+
+augment(glm_city_incomerank_model)
+
+glance(glm_city_incomerank_model)
+```
+

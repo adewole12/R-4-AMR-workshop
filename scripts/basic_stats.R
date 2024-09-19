@@ -109,3 +109,15 @@ lon_dims_imd_2019 %>%
   geom_point(alpha = 0.5) + 
   geom_smooth(method='lm', formula= y~x) #use regression line 
 
+
+
+
+
+
+
+
+
+lowest_life_exp2002 <- gapminder %>% 
+  filter(year == 2002) %>% 
+  summarise('lowest life expectancy' = min(lifeExp))
+

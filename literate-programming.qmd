@@ -12,8 +12,9 @@ Quarto enables you to weave together content and executable code into a finished
 
 When you click the **Render** button a document will be generated that includes both content and the output of embedded code. You can embed code like this:
 
-```{r, include = FALSE}
+```{r}
 #| echo: false
+#| include: false
 # Load pacman and install the required packages
 library(ggplot2)
 library(readr)
@@ -90,3 +91,21 @@ It is done by wrapping in
 $$
 y = \mu + \sum_{i=1}^p \beta_i x_i + \epsilon
 $$ Einstein's famous formula is $e = mc^2$
+
+## Mean life expectancy
+
+You can generate a dynamic report with the imputation of calculated values directly in the text. This will iteratively take into consideration changes to the data and limit need for manual data imputation.
+```{r}
+#| include: false
+
+mean_lifeExp <- round(mean(gapminder$lifeExp), 2)
+
+lowest_life_exp2002 <- gapminder %>% 
+  filter(year == 2002) %>% 
+  summarise('lowest life expectancy' = min(lifeExp))
+```
+
+
+The mean life expectancy for `r mean_lifeExp` and the standard deviation is `r round(sd(gapminder$lifeExp), 2)`. The lowest life expectancy reported in 2002 was `r lowest_life_exp2002`
+
+
