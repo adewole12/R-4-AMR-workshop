@@ -89,7 +89,7 @@ glance(cipro_region_logit)
 # Descriptive statistics alongside univariate regression, with no spanning header
 region_model_summary <-
   amrData[c("age_years_sd", "sex_male", "region", "had_surgery_past_yr", "ethnicity", "imd")] %>%
-  tbl_summary(missing = "no") %>%
+  tbl_summary(missing = "no", statistic = list(all_continuous() ~ "{mean} ({sd})") )%>%
   add_n() %>%
   modify_header(stat_0 ~ "**Summary Statistics**")
 
