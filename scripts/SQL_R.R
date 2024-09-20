@@ -112,14 +112,24 @@ dbGetQuery(cdrcDB,
 
 ### Challenge 2
 # Write a query that returns lsoa11, ah3h_rank, ah3g_rnk and ah3e_rnk
-# from the ahah table, where ah3h_rnk s below 500 and ah3e_rnk is between 3500 and 4500.
+# from the ahah table, where ah3h_rnk s below 500 or ah3e_rnk is between 3500 and 4500.
 # Limit responses to 15
 
 dbGetQuery(cdrcDB,
            "
            SELECT lsoa11, ah3h_rnk, ah3g_rnk, ah3e_rnk
            FROM ahah
-           WHERE (ah3h_rnk < 500) AND (ah3e_rnk BETWEEN 3500 AND 4500)
-           ORDER BY ah3h_rnk DESC
+           WHERE (ah3h_rnk < 500) OR (ah3e_rnk BETWEEN 3500 AND 4500)
            LIMIT 15
            ")
+
+lsoa11_subset <- dbGetQuery(cdrcDB,
+                             "SELECT lsoa11, ah3h_rnk, ah3g_rnk, ah3e_rnk
+                             FROM ahah
+                             WHERE (ah3h_rnk < 500) OR (ah3e_rnk BETWEEN 3500 AND 4500)
+                             LIMIT 15")
+lsoa11_subset
+
+
+
+
