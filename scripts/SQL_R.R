@@ -133,3 +133,44 @@ lsoa11_subset
 
 
 
+#################################################
+## Joining data
+
+dbListFields(cdrcDB, "imd")
+dbListFields(cdrcDB, "ahah")
+
+dbGetQuery(cdrcDB,"
+           SELECT lsoa11, LSOA, ah3gp, laname 
+           FROM ahah
+           JOIN imd
+           ON ahah.lsoa11 = imd.LSOA
+           LIMIT 10
+           ")
+
+
+imd_table <- tbl(cdrcDB, "imd")
+ahah_table <- tbl(cdrcDB, "ahah")
+
+first_10_lanames <- imd_table %>% 
+  select(laname) %>% 
+  head(10)
+
+first_10_lanames 
+
+## this helps to show the SQL query equivalence of specific R codes
+imd_table %>% 
+  select(laname) %>% 
+  head(10) %>% 
+  show_query()
+
+ahah_table %>% 
+  left_join(imd_table, by = join_by(lsoa11 == LSOA)) %>% 
+  select(lsoa11, ah3gp, laname) 
+
+ahah_table %>% 
+  left_join(imd_table, by = join_by(lsoa11 == LSOA)) %>% 
+  select(lsoa11, ah3gp, laname) %>% 
+  show_query()
+
+
+
