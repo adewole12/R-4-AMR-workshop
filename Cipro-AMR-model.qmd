@@ -1,0 +1,102 @@
+---
+title: "Cipro AMR model"
+author: "Adewole"
+format: html
+editor: visual
+---
+
+## Ciprofloxacin AMR infection and assocaited regional characteristics
+Logistic regression to explore the relationship between different demographic characteristics and the risk of Ciprofloxacin associated AMR infection
+
+```{r, load libraries}
+#| echo: false
+#| message: false 
+#| include: false
+
+## Load libraries and import data
+library(broom)
+library(tidyverse)
+library(car)
+library(lmtest)
+library(aod)
+library(gtsummary)
+```
+
+You can add options to executable code like this
+
+```{r import data}
+#| echo: false
+#| message: false 
+#| include: false
+
+amrData <- read.csv("data/dig_health_hub_amr.csv")
+```
+
+
+Data wrangling and date calculation need to be carried out
+
+```{r}
+#| echo: false
+## Calculate age in years when specimen taken
+amrData <- amrData %>% 
+  mutate(age_years_sd = (dob %--% spec_date) %/% years(1)
+         )
+
+View(amrData)
+
+amrData <- amrData %>% 
+  mutate(
+    spec_date_YMD = as.Date(amrData$spec_date),
+    dob_YMD = as.Date(amrData$dob)
+  )
+
+
+amrData$imd <- as.factor(amrData$imd)
+```
+
+### Descriptive statistics and preliminary data exploration
+```{r}
+#| echo: false
+# to summarise the AMR data into a table
+amrData %>% tbl_summary(include=c("sex_male","age_years_sd","region","had_surgery_past_yr","ethnicity","imd","organism","coamox","cipro","gentam"),
+              missing = c("no"),
+              statistic = list(all_continuous() ~ "{mean} ({sd})", all_categorical() ~ "{n} ({p}%)"))
+
+```
+
+##Initial model exploring the relationship of selected demographic characteristics with cipro AMR risk 
+
+```{r}
+#| echo: false
+#| message: false
+cipro_region_logit <- glm(cipro ~ age_years_sd + sex_male + region + had_surgery_past_yr + ethnicity + imd,
+                         data = amrData,
+                         family = "binomial")
+
+tidy(cipro_region_logit)
+
+summary(cipro_region_logit)
+
+
+glance(cipro_region_logit)
+
+```
+
+
+```{r}
+#| echo: false
+#| message: false
+# Descriptive statistics alongside univariate regression, with no spanning header
+region_model_summary <-
+  amrData[c("age_years_sd", "sex_male", "region", "had_surgery_past_yr", "ethnicity", "imd")] %>%
+  tbl_summary(missing = "no") %>%
+  add_n() %>%
+  modify_header(stat_0 ~ "**Summary Statistics**")
+
+region_model <- tbl_regression(cipro_region_logit, exponentiate = TRUE)
+
+tbl_merge(tbls = list(region_model_summary, region_model)) %>%
+  modify_spanning_header(everything() ~ NA_character_)
+```
+
+

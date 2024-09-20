@@ -1,6 +1,9 @@
 ## Load libraries and import data
 library(broom)
 library(tidyverse)
+library(car)
+library(lmtest)
+library(aod)
 
 
 amrData <- read.csv("data/dig_health_hub_amr.csv")
@@ -99,6 +102,131 @@ linearPlot <- linearity.data %>%
 library(report)
 
 # Get a plain English report of the model
+
 report(coamox_logit)
+
+
+
+
+####################################################################
+#####
+
+coamox_surg_logit <- glm(coamox ~ age_years_sd + sex_male + had_surgery_past_yr,
+                    data = amrData,
+                    family = "binomial")
+
+tidy(coamox_surg_logit)
+
+car::vif(coamox_surg_logit)
+
+
+#### Including reporting for all regions
+coamox_region_logit <- glm(coamox ~ age_years_sd + sex_male + region,
+                         data = amrData,
+                         family = "binomial")
+
+
+tidy(coamox_region_logit)
+
+summary(coamox_region_logit)
+
+
+glance(coamox_region_logit)
+
+# report(coamox_region_logit)
+
+waldtest(b = coeff(coamox_region_logit),
+          Sigma = vcov(coamox_region_logit), Terms = 3:11)
+
+
+??wald.test
+
+
+###################################################
+tbl_regression(coamox_region_logit, exponentiate = TRUE)
+
+?tbl_regression
+
+
+?gtsummary
+
+tidy_wald_test(coamox_region_logit)
+
+# #########################################################
+# Update the model you created in Challenge 1 to include 
+# either ethnicity or imd as an independent variable
+# What is the log odds reported and is it statistically significant 
+
+coamox_ethn_logit <- glm(coamox ~ age_years_sd + sex_male + ethnicity + had_surgery_past_yr,
+                         data = amrData,
+                         family = "binomial")
+
+tidy(coamox_ethn_logit)
+
+car::vif(coamox_ethn_logit)
+
+tidy_wald_test(coamox_ethn_logit)
+
+tbl_regression(coamox_ethn_logit, exponentiate = TRUE)
+
+
+### CI for region model 
+confint(coamox_region_logit)
+
+
+# Descriptive statistics alongside univariate regression, with no spanning header
+region_model_summary <-
+  amrData[c("age_years_sd", "sex_male", "region")] %>%
+  tbl_summary(missing = "no") %>%
+  add_n() %>%
+  modify_header(stat_0 ~ "**Summary Statistics**")
+
+
+region_model <- tbl_regression(coamox_region_logit, exponentiate = TRUE)
+
+tbl_merge(tbls = list(region_model_summary, region_model)) %>%
+  modify_spanning_header(everything() ~ NA_character_)
+
+
+
+?tbl_merge
+
+###########
+
+amrData$imd <- as.factor(amrData$imd)
+
+
+coamox_imd_logit <- glm(coamox ~ age_years_sd + sex_male + imd + had_surgery_past_yr,
+                         data = amrData,
+                         family = "binomial")
+
+tbl_regression(coamox_imd_logit, exponentiate = TRUE)
+
+tidy_wald_test(coamox_imd_logit)
+
+
+# #
+# You can also use odds.n.ends to check the quality of your model 
+
+library(odds.n.ends)
+
+coamox_region_logitOR <- odds.n.ends(coamox_region_logit)
+coamox_region_logitOR
+
+?odds.n.ends
+
+
+##################################################################################
+
+
+colnames(amrData)
+
+
+
+
+
+
+
+
 
 
