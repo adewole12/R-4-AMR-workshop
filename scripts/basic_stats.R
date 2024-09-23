@@ -112,12 +112,9 @@ lon_dims_imd_2019 %>%
 
 
 
-
-
-
-
-
 lowest_life_exp2002 <- gapminder %>% 
   filter(year == 2002) %>% 
   summarise('lowest life expectancy' = min(lifeExp))
+
+####### changes made to the basic script on macWole branch
 
